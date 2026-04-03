@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R3</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #0a0a0a;
+    --glass: rgba(255,255,255,0.05);
+    --accent: #ff7a7a;
+    --accent2: #ffb3b3;
+    --nav-height: 80px;
+}
+
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+/* Hide scrollbar */
+body::-webkit-scrollbar { display: none; }
+body { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Hide default cursor */
+body { cursor: none; }
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
+
+body {
+    background: #0a0a0a;
+    color: white;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Particle background */
+#particle-canvas {
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* Scroll progress bar */
+.progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%;
+    z-index: 999;
+}
+
+/* Navbar */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: var(--nav-height);
+    padding: 0 40px;
+    backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 998;
+}
+
+nav h1 { font-weight: 700; letter-spacing: 1px; }
+nav a { color: white; text-decoration: none; margin-left: 20px; opacity: 0.7; transition: 0.3s; }
+nav a.active { opacity: 1; font-weight: 700; text-shadow: 0 0 10px var(--accent); }
+nav a:hover { opacity: 1; }
+
+/* Sections */
+section {
+    min-height: 100vh;
+    padding: 0 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Hero */
+.hero h1 {
+    font-size: 4rem;
+    line-height: 1.1;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    color: transparent;
+}
+.hero p { margin-top: 20px; max-width: 500px; opacity: 0.7; }
+
+/* Buttons */
+.buttons { margin-top: 30px; }
+.btn {
+    padding: 14px 28px;
+    border-radius: 30px;
+    border: none;
+    margin: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s, box-shadow 0.3s;
+}
+.primary { background: linear-gradient(90deg, var(--accent), var(--accent2)); color: white; }
+.secondary { background: var(--glass); color: white; backdrop-filter: blur(10px); }
+.btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 0 20px var(--accent); }
+
+/* Cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; margin-top: 50px; }
+.card {
+    background: var(--glass);
+    padding: 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    transition: 0.4s, box-shadow 0.4s;
+}
+.card:hover {
+    transform: translateY(-10px);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 20px var(--accent2);
+}
+
+/* Big text section */
+.big-text { font-size: 2.5rem; max-width: 800px; line-height: 1.3; }
+
+/* Footer */
+footer { padding: 40px; text-align: center; opacity: 0.5; }
+
+/* Fade animations */
+.reveal { opacity: 0; transform: translateY(60px); transition: 1s ease; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* Custom Cursor */
+.cursor-inner, .cursor-outer {
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}
+
+.cursor-inner {
+    width: 10px;
+    height: 10px;
+    background: white;
+}
+
+.cursor-outer {
+    width: 40px;
+    height: 40px;
+    border: 2px solid white;
+    transition: all 0.15s ease-out;
+}
+/* Reviews Section */
+#reviews h2 {
+  margin-bottom: 40px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  color: transparent;
+  text-align: center;
+}
+
+#reviews .card p {
+  font-style: italic;
+  opacity: 0.85;
+  margin-bottom: 15px;
+}
+
+#reviews .card strong {
+  display: block;
+  text-align: right;
+  opacity: 0.7;
+  font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="particle-canvas"></canvas>
+<div class="progress" id="progress"></div>
+
+<nav>
+    <h1>R3</h1>
+    <div>
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#community" class="nav-link">Join</a>
+    </div>
+</nav>
+
+<section class="hero" id="home">
+    <h1>R3 Mod Menu</h1>
+    <p>Built different. Clean, fast, and actually fun to use.</p>
+
+    <div class="buttons">
+        <button class="btn secondary" onclick="document.getElementById('community').scrollIntoView({behavior:'smooth'})">Join Discord</button>
+    </div>
+</section>
+
+<section class="reveal" id="intro">
+    <h2 class="big-text">Not just another menu — R3 is designed to feel smooth, responsive, and powerful.</h2>
+</section>
+
+<section class="reveal" id="features">
+    <h2>Features</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>2 Lag Methods</h3>
+            <p>Two different lag setups depending on how hard you want to push it.</p>
+        </div>
+        <div class="card">
+            <h3>Server Freezers</h3>
+            <p>Lock down lobbies and control the flow of the game.</p>
+        </div>
+        <div class="card">
+            <h3>Stutter Mods</h3>
+            <p>Create unpredictable movement and throw people off instantly.</p>
+        </div>
+        <div class="card">
+            <h3>Clean Interface</h3>
+            <p>No clutter. Everything feels smooth and intentional.</p>
+        </div>
+    </div>
+</section>
+
+<section class="reveal" id="reviews">
+  <h2>What Users Say</h2>
+  <div class="grid">
+    <div class="card">
+      <p>“This is totally better than my mod menu, Untitled Menu!”</p>
+      <strong>- Shiba GT</strong>
+    </div>
+    <div class="card">
+      <p>“I made cummies.”</p>
+      <strong>- IIDK</strong>
+    </div>
+    <div class="card">
+      <p>“ts so tuff frfr.”</p>
+      <strong>- Ty</strong>
+    </div>
+  </div>
+</section>
+
+<section class="reveal">
+    <h2 class="big-text">Everything is tuned for that satisfying feel — from visuals to performance.</h2>
+</section>
+
+<section class="reveal">
+    <h2 class="big-text">R3 is focused on user experience the most, not being the most overpowered, but producing the best possible experience.</h2>
+</section>
+
+<section class="reveal" id="community">
+    <h2>Join the community</h2>
+    <p style="opacity:0.7; max-width:500px;">Updates, support, and new drops happen in the Discord.</p>
+
+    <div class="buttons">
+        <button class="btn primary" onclick="window.location.href='https://discord.gg/AxyXjjHfEp'">Join Discord</button>
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 R3</p>
+</footer>
+
+<!-- Cursor -->
+<div class="cursor-inner"></div>
+<div class="cursor-outer"></div>
+
+<script>
+// Scroll progress
+window.onscroll = () => {
+    let winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+    let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    let scrolled = (winScroll / height) * 100;
+    document.getElementById("progress").style.width = scrolled + "%";
+
+    const sections = document.querySelectorAll("section");
+    const navLinks = document.querySelectorAll(".nav-link");
+    sections.forEach((sec, idx) => {
+        const top = sec.offsetTop - 100;
+        const bottom = top + sec.offsetHeight;
+        if (winScroll >= top && winScroll < bottom) {
+            navLinks.forEach(link => link.classList.remove("active"));
+            navLinks[idx].classList.add("active");
+        }
+    });
+};
+
+// Reveal sections
+const reveals = document.querySelectorAll(".reveal");
+window.addEventListener("scroll", () => {
+    reveals.forEach(el => {
+        if(el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add("active");
+    });
+});
+
+const cursorInner = document.querySelector('.cursor-inner');
+const cursorOuter = document.querySelector('.cursor-outer');
+
+let mouseX = 0, mouseY = 0;
+let outerX = 0, outerY = 0;
+
+// Calculate half sizes of both circles
+const innerHalfWidth = cursorInner.offsetWidth / 2;
+const innerHalfHeight = cursorInner.offsetHeight / 2;
+const outerHalfWidth = cursorOuter.offsetWidth / 2;
+const outerHalfHeight = cursorOuter.offsetHeight / 2;
+
+document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    // Inner circle moves instantly at mouse
+    cursorInner.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+});
+
+function animateOuter() {
+    // Calculate offset for outer circle position:
+    // center the outer circle relative to inner circle
+    const targetX = mouseX - outerHalfWidth + innerHalfWidth;
+    const targetY = mouseY - outerHalfHeight + innerHalfHeight;
+
+    // Smoothly move outer circle toward target position
+    outerX += (targetX - outerX) * 0.15;
+    outerY += (targetY - outerY) * 0.15;
+
+    cursorOuter.style.transform = `translate(${outerX}px, ${outerY}px)`;
+    requestAnimationFrame(animateOuter);
+}
+
+animateOuter();
+
+// Particle background
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function createParticles() {
+    particles = [];
+    for(let i=0;i<80;i++){
+        particles.push({
+            x: Math.random()*canvas.width,
+            y: Math.random()*canvas.height,
+            radius: Math.random()*4 + 1,
+            speedX: (Math.random()-0.5)*0.2,
+            speedY: (Math.random()-0.5)*0.2,
+            alpha: Math.random()*0.5 + 0.2
+        });
+    }
+}
+createParticles();
+
+function animateParticles() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if(p.x<0) p.x=canvas.width;
+        if(p.x>canvas.width) p.x=0;
+        if(p.y<0) p.y=canvas.height;
+        if(p.y>canvas.height) p.y=0;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+        ctx.fill();
+    });
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+</script>
+
+</body>
+</html>
